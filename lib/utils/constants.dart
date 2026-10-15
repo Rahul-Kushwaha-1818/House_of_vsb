@@ -1,21 +1,10 @@
-import 'package:flutter/foundation.dart';
-
 class AppConstants {
-  // Detect standard host based on platform
-  static String get defaultBaseUrl {
-    if (kIsWeb) {
-      return 'http://localhost:5000';
-    }
-    // Android emulator host loopback vs localhost
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 'http://10.0.2.2:5000';
-      default:
-        return 'http://localhost:5000';
-    }
-  }
+  // Live deployed Render backend URL
+  static const String liveServerUrl = 'https://house-of-vsb.onrender.com';
 
-  static String get defaultSocketUrl => defaultBaseUrl;
+  static String get defaultBaseUrl => liveServerUrl;
+
+  static String get defaultSocketUrl => liveServerUrl;
 
   // Demo accounts for quick review login
   static const List<Map<String, String>> demoAccounts = [

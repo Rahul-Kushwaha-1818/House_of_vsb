@@ -80,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
               controller: controller,
               decoration: const InputDecoration(
                 labelText: 'Base URL',
-                hintText: 'http://192.168.1.50:5000',
+                hintText: 'https://house-of-vsb.onrender.com',
               ),
             ),
           ],
