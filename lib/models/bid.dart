@@ -30,7 +30,7 @@ class Bid {
 
     DateTime parsedDate = DateTime.now();
     if (json['createdAt'] != null) {
-      parsedDate = DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now();
+      parsedDate = DateTime.tryParse(json['createdAt'].toString())?.toLocal() ?? DateTime.now();
     }
 
     return Bid(

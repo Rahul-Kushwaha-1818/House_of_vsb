@@ -116,6 +116,29 @@ void main() {
       expect(auction.sortedBids[3].amount, 850);
       expect(auction.sortedBids[3].bidderName, 'Bob');
     });
+
+    test('Auction.fromJson maps UTC ISO strings to local DateTime without offset skew', () {
+      final nowUtc = DateTime.now().toUtc();
+      final json = {
+        '_id': 'auc_tz',
+        'title': 'Timezone Test Auction',
+        'description': 'Testing UTC to local mapping',
+        'startingPrice': 100,
+        'minIncrement': 10,
+        'currentHighestBid': 0,
+        'startTime': nowUtc.toIso8601String(),
+        'endTime': nowUtc.add(const Duration(hours: 2)).toIso8601String(),
+        'status': 'live',
+        'bids': [],
+      };
+      final auction = Auction.fromJson(json);
+
+      expect(auction.startTime.isUtc, isFalse);
+      expect(auction.endTime.isUtc, isFalse);
+      // Difference between auction.startTime and local now should be within 2 seconds
+      final diff = auction.startTime.difference(DateTime.now()).inSeconds.abs();
+      expect(diff <= 2, isTrue);
+    });
   });
 
   group('AppNotification Model Tests', () {

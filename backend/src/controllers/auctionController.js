@@ -146,9 +146,15 @@ const createAuction = async (req, res, next) => {
     }
 
     // Determine initial status based on start time
+    // Allow a 60-second grace window to account for network transmission time and slight clock drift
+    const graceWindow = new Date(now.getTime() + 60 * 1000);
     let initialStatus = 'upcoming';
-    if (startDate <= now && endDate > now) {
+    let actualStartDate = startDate;
+    if (startDate <= graceWindow && endDate > now) {
       initialStatus = 'live';
+      if (startDate > now) {
+        actualStartDate = now;
+      }
     }
 
     // Handle image file or URL fallback
@@ -164,7 +170,7 @@ const createAuction = async (req, res, next) => {
       minIncrement: numMinIncrement,
       currentHighestBid: 0,
       currentHighestBidder: null,
-      startTime: startDate,
+      startTime: actualStartDate,
       endTime: endDate,
       status: initialStatus,
       imageUrl,
@@ -220,7 +226,7 @@ const placeBid = async (req, res, next) => {
     }
 
     // Rule: Accepts bids only between start time and end time
-    if (now < new Date(auction.startTime) || auction.status === 'upcoming') {
+    if (auction.status === 'upcoming' || (auction.status !== 'live' && now < new Date(auction.startTime))) {
       return res.status(400).json({
         success: false,
         message: `Auction has not started yet. Begins at ${new Date(auction.startTime).toLocaleString()}`,

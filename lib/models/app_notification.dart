@@ -33,7 +33,7 @@ class AppNotification {
           : json['auctionId']?.toString(),
       isRead: json['isRead'] ?? false,
       createdAt: json['createdAt'] != null
-          ? DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now()
+          ? DateTime.tryParse(json['createdAt'].toString())?.toLocal() ?? DateTime.now()
           : DateTime.now(),
     );
   }

@@ -160,8 +160,8 @@ class ApiService {
       request.fields['description'] = description;
       request.fields['startingPrice'] = startingPrice.toString();
       request.fields['minIncrement'] = minIncrement.toString();
-      request.fields['startTime'] = startTime.toIso8601String();
-      request.fields['endTime'] = endTime.toIso8601String();
+      request.fields['startTime'] = startTime.toUtc().toIso8601String();
+      request.fields['endTime'] = endTime.toUtc().toIso8601String();
 
       if (imageBytes != null && imageBytes.isNotEmpty) {
         String fname = imageFileName ?? 'upload.jpg';
