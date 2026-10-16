@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- smooth navy gradient background for the home icon -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="270"
+        android:startColor="#0D2146"
+        android:centerColor="#0B1C3D"
+        android:endColor="#040C1E"
+        android:type="linear" />
+</shape>
