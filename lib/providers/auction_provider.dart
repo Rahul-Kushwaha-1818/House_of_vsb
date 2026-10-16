@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/auction.dart';
 import '../models/bid.dart';
@@ -13,9 +14,12 @@ class AuctionProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
   String _currentFilter = 'live'; // 'live', 'upcoming', 'ended', 'my_bids'
+  Timer? _keepAliveTimer;
 
   AuctionProvider(this._apiService, this._socketService) {
     _initSocketListeners();
+    // ping backend every 4 minutes (under 5 mins) so render stays awake
+    _startKeepAliveTimer();
   }
 
   List<Auction> get auctions => _auctions;
@@ -205,5 +209,19 @@ class AuctionProvider extends ChangeNotifier {
     } catch (e) {
       return {'success': false, 'message': 'Failed to create auction: $e'};
     }
+  }
+
+  // ping backend every 4 minutes (under 5 mins) so render stays awake
+  void _startKeepAliveTimer() {
+    _keepAliveTimer?.cancel();
+    _keepAliveTimer = Timer.periodic(const Duration(minutes: 4), (_) {
+      _apiService.checkHealth();
+    });
+  }
+
+  @override
+  void dispose() {
+    _keepAliveTimer?.cancel();
+    super.dispose();
   }
 }

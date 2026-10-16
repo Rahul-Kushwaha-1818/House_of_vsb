@@ -5,6 +5,8 @@ const app = require('./src/app');
 const connectDB = require('./src/config/db');
 const { initSocket } = require('./src/services/socketService');
 const { startAuctionWorker, stopAuctionWorker } = require('./src/services/auctionWorker');
+// keep alive service so render free tier doesn't sleep
+const { startKeepAlive, stopKeepAlive } = require('./src/services/keepAliveService');
 const { seedUsersAndAuctions } = require('./src/config/seedHelper');
 
 const PORT = process.env.PORT || 5000;
@@ -38,6 +40,9 @@ const startServer = async () => {
 
       // Start background auction scheduler / lifecycle worker
       startAuctionWorker(4000);
+
+      // keep server awake on render free tier (ping under 5 mins)
+      startKeepAlive(4 * 60 * 1000);
     });
   } catch (error) {
     console.error('Failed to start server:', error);
@@ -49,6 +54,7 @@ const startServer = async () => {
 const shutdown = () => {
   console.log('\nShutting down gracefully...');
   stopAuctionWorker();
+  stopKeepAlive();
   server.close(() => {
     console.log('Server closed');
     process.exit(0);

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../services/api_service.dart';
 import '../providers/auth_provider.dart';
 import 'login_screen.dart';
 import 'auction_list_screen.dart';
@@ -39,6 +40,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     // Hold splash screen for exactly 3 seconds before navigating
     Timer(const Duration(seconds: 3), _navigateToNextScreen);
+
+    // ping backend right away so render wakes up fast
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<ApiService>().checkHealth();
+      }
+    });
   }
 
   @override

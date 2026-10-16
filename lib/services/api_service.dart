@@ -323,4 +323,15 @@ class ApiService {
       // Best effort mark all read
     }
   }
+
+  // ping server health so render stays awake under 5 mins
+  Future<bool> checkHealth() async {
+    final url = Uri.parse('$baseUrl/health');
+    try {
+      final response = await http.get(url).timeout(const Duration(seconds: 15));
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
 }
