@@ -16,10 +16,12 @@ class AuctionProvider extends ChangeNotifier {
   String _currentFilter = 'live'; // 'live', 'upcoming', 'ended', 'my_bids'
   Timer? _keepAliveTimer;
 
-  AuctionProvider(this._apiService, this._socketService) {
+  AuctionProvider(this._apiService, this._socketService, {bool startKeepAlive = true}) {
     _initSocketListeners();
     // ping backend every 4 minutes (under 5 mins) so render stays awake
-    _startKeepAliveTimer();
+    if (startKeepAlive) {
+      _startKeepAliveTimer();
+    }
   }
 
   List<Auction> get auctions => _auctions;

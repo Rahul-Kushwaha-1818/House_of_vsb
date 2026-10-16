@@ -20,6 +20,14 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
+  // for testing different user roles in widget tests
+  @visibleForTesting
+  void setUserForTesting(AppUser? user, [String? token = 'mock_token']) {
+    _user = user;
+    _token = token;
+    notifyListeners();
+  }
+
   static const String _keyToken = 'auth_token';
   static const String _keyUser = 'auth_user';
 

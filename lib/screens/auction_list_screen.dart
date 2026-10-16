@@ -20,17 +20,34 @@ class AuctionListScreen extends StatefulWidget {
 
 class _AuctionListScreenState extends State<AuctionListScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late List<Map<String, String>> _tabs;
+  bool? _lastIsAdmin;
 
-  final List<Map<String, String>> _tabs = [
-    {'key': 'live', 'label': 'Live'},
-    {'key': 'upcoming', 'label': 'Upcoming'},
-    {'key': 'ended', 'label': 'Ended'},
-    {'key': 'my_bids', 'label': 'My Bids'},
-  ];
+  // show my bids tab only for normal users, remove it for admin
+  List<Map<String, String>> _getTabsForRole(bool isAdmin) {
+    if (isAdmin) {
+      // admin cannot bid so no my bids tab
+      return const [
+        {'key': 'live', 'label': 'Live'},
+        {'key': 'upcoming', 'label': 'Upcoming'},
+        {'key': 'ended', 'label': 'Ended'},
+      ];
+    }
+    // normal users can bid so show my bids
+    return const [
+      {'key': 'live', 'label': 'Live'},
+      {'key': 'upcoming', 'label': 'Upcoming'},
+      {'key': 'ended', 'label': 'Ended'},
+      {'key': 'my_bids', 'label': 'My Bids'},
+    ];
+  }
 
   @override
   void initState() {
     super.initState();
+    final isAdmin = context.read<AuthProvider>().isAdmin;
+    _lastIsAdmin = isAdmin;
+    _tabs = _getTabsForRole(isAdmin);
     _tabController = TabController(length: _tabs.length, vsync: this);
     _tabController.addListener(_onTabChanged);
 
@@ -42,6 +59,25 @@ class _AuctionListScreenState extends State<AuctionListScreen> with SingleTicker
       }
       context.read<NotificationProvider>().fetchNotifications();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final isAdmin = context.watch<AuthProvider>().isAdmin;
+    if (_lastIsAdmin != isAdmin) {
+      _lastIsAdmin = isAdmin;
+      _tabs = _getTabsForRole(isAdmin);
+      _tabController.removeListener(_onTabChanged);
+      _tabController.dispose();
+      _tabController = TabController(length: _tabs.length, vsync: this);
+      _tabController.addListener(_onTabChanged);
+
+      // if admin was on my bids reset back to live tab
+      if (isAdmin && context.read<AuctionProvider>().currentFilter == 'my_bids') {
+        context.read<AuctionProvider>().setFilter('live');
+      }
+    }
   }
 
   @override

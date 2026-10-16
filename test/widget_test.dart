@@ -10,6 +10,8 @@ import 'package:first_app/screens/splash_screen.dart';
 import 'package:first_app/screens/signup_screen.dart';
 import 'package:first_app/screens/forgot_password_screen.dart';
 import 'package:first_app/screens/notifications_screen.dart';
+import 'package:first_app/screens/auction_list_screen.dart';
+import 'package:first_app/models/user.dart';
 import 'package:first_app/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -171,5 +173,98 @@ void main() {
 
     expect(find.text('Notifications'), findsOneWidget);
     expect(find.text('No Notifications Yet'), findsOneWidget);
+  });
+
+  testWidgets('AuctionListScreen hides My Bids tab for Admin role', (WidgetTester tester) async {
+    final apiService = ApiService();
+    final socketService = SocketService();
+    final authProvider = AuthProvider(apiService);
+    final auctionProvider = AuctionProvider(apiService, socketService, startKeepAlive: false);
+    final notifProvider = NotificationProvider(apiService, socketService);
+
+    addTearDown(() {
+      authProvider.dispose();
+      auctionProvider.dispose();
+      notifProvider.dispose();
+    });
+
+    // set admin user
+    authProvider.setUserForTesting(const AppUser(
+      id: 'admin_1',
+      name: 'Auction Admin',
+      email: 'admin@auction.com',
+      role: 'admin',
+    ));
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<ApiService>.value(value: apiService),
+          Provider<SocketService>.value(value: socketService),
+          ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+          ChangeNotifierProvider<AuctionProvider>.value(value: auctionProvider),
+          ChangeNotifierProvider<NotificationProvider>.value(value: notifProvider),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: const AuctionListScreen(),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // admin sees Live, Upcoming, Ended
+    expect(find.text('Live'), findsOneWidget);
+    expect(find.text('Upcoming'), findsOneWidget);
+    expect(find.text('Ended'), findsOneWidget);
+    // My Bids tab must be completely removed for admin
+    expect(find.text('My Bids'), findsNothing);
+  });
+
+  testWidgets('AuctionListScreen shows My Bids tab for regular User role', (WidgetTester tester) async {
+    final apiService = ApiService();
+    final socketService = SocketService();
+    final authProvider = AuthProvider(apiService);
+    final auctionProvider = AuctionProvider(apiService, socketService, startKeepAlive: false);
+    final notifProvider = NotificationProvider(apiService, socketService);
+
+    addTearDown(() {
+      authProvider.dispose();
+      auctionProvider.dispose();
+      notifProvider.dispose();
+    });
+
+    // set regular user
+    authProvider.setUserForTesting(const AppUser(
+      id: 'user_1',
+      name: 'Alice Walker',
+      email: 'alice@auction.com',
+      role: 'user',
+    ));
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<ApiService>.value(value: apiService),
+          Provider<SocketService>.value(value: socketService),
+          ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+          ChangeNotifierProvider<AuctionProvider>.value(value: auctionProvider),
+          ChangeNotifierProvider<NotificationProvider>.value(value: notifProvider),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: const AuctionListScreen(),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // user sees all 4 tabs including My Bids
+    expect(find.text('Live'), findsOneWidget);
+    expect(find.text('Upcoming'), findsOneWidget);
+    expect(find.text('Ended'), findsOneWidget);
+    expect(find.text('My Bids'), findsOneWidget);
   });
 }
