@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/auction_provider.dart';
-import 'providers/notification_provider.dart';
 import 'services/api_service.dart';
 import 'services/socket_service.dart';
 import 'screens/splash_screen.dart';
@@ -24,9 +23,6 @@ void main() async {
         ),
         ChangeNotifierProvider<AuctionProvider>(
           create: (_) => AuctionProvider(apiService, socketService),
-        ),
-        ChangeNotifierProvider<NotificationProvider>(
-          create: (_) => NotificationProvider(apiService, socketService),
         ),
       ],
       child: const AuctionApp(),

@@ -6,8 +6,6 @@ import '../services/socket_service.dart';
 import '../utils/constants.dart';
 import '../theme/app_theme.dart';
 import 'auction_list_screen.dart';
-import 'signup_screen.dart';
-import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -221,25 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 6),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      auth.clearError();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
-                      );
-                    },
-                    style: TextButton.styleFrom(
-                      visualDensity: VisualDensity.compact,
-                      padding: EdgeInsets.zero,
-                    ),
-                    child: const Text('Forgot Password?'),
-                  ),
-                ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 20),
 
                 // Sign In Button
                 ElevatedButton(
@@ -251,34 +231,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                         )
                       : const Text('Sign In'),
-                ),
-                const SizedBox(height: 16),
-
-                // Sign Up Link
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Don't have an account? ",
-                      style: TextStyle(color: AppTheme.textMuted),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        auth.clearError();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const SignupScreen()),
-                        );
-                      },
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          color: AppTheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
                 const SizedBox(height: 28),
 

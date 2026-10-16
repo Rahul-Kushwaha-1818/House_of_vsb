@@ -7,9 +7,6 @@ import '../widgets/auction_card.dart';
 import 'auction_detail_screen.dart';
 import 'create_auction_screen.dart';
 import 'login_screen.dart';
-import 'notifications_screen.dart';
-import '../providers/notification_provider.dart';
-import '../services/socket_service.dart';
 
 class AuctionListScreen extends StatefulWidget {
   const AuctionListScreen({super.key});
@@ -53,11 +50,6 @@ class _AuctionListScreenState extends State<AuctionListScreen> with SingleTicker
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AuctionProvider>().fetchAuctions();
-      final user = context.read<AuthProvider>().user;
-      if (user != null) {
-        context.read<SocketService>().joinUser(user.id);
-      }
-      context.read<NotificationProvider>().fetchNotifications();
     });
   }
 
@@ -112,7 +104,6 @@ class _AuctionListScreenState extends State<AuctionListScreen> with SingleTicker
     );
 
     if (confirm == true && mounted) {
-      context.read<SocketService>().leaveUser();
       await context.read<AuthProvider>().logout();
       if (mounted) {
         Navigator.pushReplacement(
@@ -234,24 +225,6 @@ class _AuctionListScreenState extends State<AuctionListScreen> with SingleTicker
           ],
         ),
         actions: [
-          Consumer<NotificationProvider>(
-            builder: (context, notifProv, _) {
-              return IconButton(
-                icon: Badge(
-                  isLabelVisible: notifProv.unreadCount > 0,
-                  label: Text('${notifProv.unreadCount}'),
-                  child: const Icon(Icons.notifications_outlined),
-                ),
-                tooltip: 'Notifications',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const NotificationsScreen()),
-                  );
-                },
-              );
-            },
-          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Refresh',
@@ -277,91 +250,6 @@ class _AuctionListScreenState extends State<AuctionListScreen> with SingleTicker
       ),
       body: Column(
         children: [
-          // Real-time Push Notification Floating Banner
-          Consumer<NotificationProvider>(
-            builder: (context, notifProv, _) {
-              final banner = notifProv.latestBannerNotification;
-              if (banner == null) return const SizedBox.shrink();
-              return Container(
-                margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.15),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: banner.isOutbid
-                            ? Colors.orange.withValues(alpha: 0.2)
-                            : (banner.isWon ? Colors.amber.withValues(alpha: 0.2) : Colors.blue.withValues(alpha: 0.2)),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        banner.isOutbid
-                            ? Icons.warning_amber_rounded
-                            : (banner.isWon ? Icons.emoji_events_rounded : Icons.notifications_active_rounded),
-                        color: banner.isOutbid
-                            ? Colors.orangeAccent
-                            : (banner.isWon ? Colors.amberAccent : Colors.lightBlueAccent),
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            banner.title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                            ),
-                          ),
-                          Text(
-                            banner.body,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.85),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (banner.auctionId != null)
-                      TextButton(
-                        onPressed: () {
-                          final auctionId = banner.auctionId!;
-                          notifProv.dismissBanner();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => AuctionDetailScreen(auctionId: auctionId)),
-                          );
-                        },
-                        child: const Text('View', style: TextStyle(color: Colors.lightBlueAccent, fontWeight: FontWeight.bold)),
-                      ),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white70, size: 18),
-                      onPressed: () => notifProv.dismissBanner(),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
           Expanded(
             child: RefreshIndicator(
               onRefresh: () => auctionProv.fetchAuctions(),
