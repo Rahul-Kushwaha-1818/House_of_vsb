@@ -1,5 +1,5 @@
 const Auction = require('../models/Auction');
-const { broadcastNewBid, broadcastAuctionCreated } = require('../services/socketService');
+const { broadcastNewBid, broadcastAuctionCreated, sendUserNotification } = require('../services/socketService');
 
 // Get all auctions with optional filters: status, myBids
 const getAuctions = async (req, res, next) => {
@@ -351,6 +351,16 @@ const placeBid = async (req, res, next) => {
       },
       totalBids: updatedAuction.bids.length,
     });
+
+    // Notify previous highest bidder that they have been outbid
+    if (previousHighestBidderId && previousHighestBidderId !== req.user._id.toString()) {
+      sendUserNotification(previousHighestBidderId, {
+        title: '⚠️ Outbid Alert!',
+        body: `Someone placed a higher bid of ₹${amount} on "${auction.title}". Place a new bid to win!`,
+        type: 'outbid',
+        auctionId: id,
+      }).catch((err) => console.error('[AuctionController] Outbid notification error:', err.message));
+    }
 
     const returnAuction = updatedAuction.toObject();
     if (returnAuction.bids && Array.isArray(returnAuction.bids)) {

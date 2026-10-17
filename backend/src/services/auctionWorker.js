@@ -1,5 +1,5 @@
 const Auction = require('../models/Auction');
-const { broadcastAuctionEnded, broadcastAuctionStarted } = require('./socketService');
+const { broadcastAuctionEnded, broadcastAuctionStarted, sendUserNotification } = require('./socketService');
 
 let workerInterval = null;
 
@@ -58,6 +58,36 @@ const processAuctionTransitions = async () => {
         winner: winnerInfo,
         highestBid: auction.currentHighestBid,
       });
+
+      // Send push notification to the winner
+      if (auction.winner) {
+        sendUserNotification(auction.winner, {
+          title: '🏆 Congratulations! You Won!',
+          body: `You won "${auction.title}" with the winning bid of ₹${auction.currentHighestBid}!`,
+          type: 'won',
+          auctionId: auction._id,
+        }).catch((err) => console.error('[AuctionWorker] Error notifying winner:', err.message));
+      }
+
+      // Send push notification to other participating bidders
+      if (auction.bids && auction.bids.length > 0) {
+        const otherBidders = new Set();
+        auction.bids.forEach((b) => {
+          const bidderId = b.bidder ? b.bidder.toString() : null;
+          if (bidderId && (!auction.winner || bidderId !== auction.winner.toString())) {
+            otherBidders.add(bidderId);
+          }
+        });
+
+        for (const bidderId of otherBidders) {
+          sendUserNotification(bidderId, {
+            title: 'Auction Ended',
+            body: `"${auction.title}" has ended. Winning bid was ₹${auction.currentHighestBid}.`,
+            type: 'lost',
+            auctionId: auction._id,
+          }).catch((err) => console.error('[AuctionWorker] Error notifying participant:', err.message));
+        }
+      }
     }
   } catch (error) {
     console.error('[Auction Worker] Error running auction lifecycle processor:', error);

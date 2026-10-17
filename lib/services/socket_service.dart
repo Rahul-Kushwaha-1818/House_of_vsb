@@ -5,12 +5,14 @@ import '../utils/constants.dart';
 typedef NewBidCallback = void Function(Map<String, dynamic> data);
 typedef AuctionUpdatedCallback = void Function(Map<String, dynamic> data);
 typedef AuctionEndedCallback = void Function(Map<String, dynamic> data);
+typedef PushNotificationCallback = void Function(Map<String, dynamic> data);
 
 class SocketService {
   socket_io.Socket? _socket;
   String _socketUrl = AppConstants.defaultSocketUrl;
   bool _isConnected = false;
   bool _hasLoggedConnectionError = false;
+  String? _currentUserId;
 
   bool get isConnected => _isConnected;
 
@@ -18,6 +20,7 @@ class SocketService {
   final List<NewBidCallback> _newBidListeners = [];
   final List<AuctionUpdatedCallback> _auctionUpdatedListeners = [];
   final List<AuctionEndedCallback> _auctionEndedListeners = [];
+  final List<PushNotificationCallback> _pushNotificationListeners = [];
 
   void setUrl(String url) {
     if (_socketUrl != url) {
@@ -51,6 +54,9 @@ class SocketService {
         _isConnected = true;
         _hasLoggedConnectionError = false;
         debugPrint('[Socket] Connected to $_socketUrl');
+        if (_currentUserId != null) {
+          _socket!.emit('join_user', _currentUserId);
+        }
       });
 
       _socket!.onDisconnect((_) {
@@ -93,11 +99,42 @@ class SocketService {
           }
         }
       });
+
+      _socket!.on('push_notification', (data) {
+        if (data is Map) {
+          final mapped = Map<String, dynamic>.from(data);
+          for (var listener in _pushNotificationListeners) {
+            listener(mapped);
+          }
+        }
+      });
     } catch (e) {
       if (kDebugMode) {
         print('[Socket] Init error: $e');
       }
     }
+  }
+
+  void joinUser(String userId) {
+    _currentUserId = userId;
+    if (_socket != null && _socket!.connected) {
+      _socket!.emit('join_user', userId);
+    }
+  }
+
+  void leaveUser() {
+    if (_currentUserId != null && _socket != null && _socket!.connected) {
+      _socket!.emit('leave_user', _currentUserId);
+    }
+    _currentUserId = null;
+  }
+
+  void addPushNotificationListener(PushNotificationCallback listener) {
+    _pushNotificationListeners.add(listener);
+  }
+
+  void removePushNotificationListener(PushNotificationCallback listener) {
+    _pushNotificationListeners.remove(listener);
   }
 
   void joinAuction(String auctionId) {
