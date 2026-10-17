@@ -473,7 +473,7 @@ class _AuctionDetailScreenState extends State<AuctionDetailScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Be the first to bid at \$${auction.startingPrice}!',
+                            'Be the first to bid at ₹${auction.startingPrice}!',
                             style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                           ),
                         ],
@@ -525,7 +525,7 @@ class _AuctionDetailScreenState extends State<AuctionDetailScreen> {
                     ),
                     Text(
                       auction.isLive
-                          ? NumberFormat.currency(symbol: '\$', decimalDigits: 0).format(auction.minRequiredBid)
+                          ? NumberFormat.currency(symbol: '₹', decimalDigits: 0).format(auction.minRequiredBid)
                           : (auction.isUpcoming ? 'Starts soon' : 'Finished'),
                       style: const TextStyle(
                         fontSize: 18,

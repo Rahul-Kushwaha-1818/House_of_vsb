@@ -47,7 +47,7 @@ const processAuctionTransitions = async () => {
 
       console.log(
         `[Auction Worker] Auction "${auction.title}" (${auction._id}) ENDED. Winner: ${
-          winnerInfo ? `${winnerInfo.name} ($${auction.currentHighestBid})` : 'No Bids (Unsold)'
+          winnerInfo ? `${winnerInfo.name} (₹${auction.currentHighestBid})` : 'No Bids (Unsold)'
         }`
       );
 

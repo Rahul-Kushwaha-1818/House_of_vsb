@@ -64,7 +64,7 @@ class _QuickBidSheetState extends State<QuickBidSheet> {
     if (amount < widget.auction.minRequiredBid) {
       setState(() {
         _errorMessage =
-            'Bid must be at least \$${widget.auction.minRequiredBid}. (Increment: \$${widget.auction.minIncrement})';
+            'Bid must be at least ₹${widget.auction.minRequiredBid}. (Increment: ₹${widget.auction.minIncrement})';
       });
       return;
     }
@@ -104,7 +104,7 @@ class _QuickBidSheetState extends State<QuickBidSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final currency = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
+    final currency = NumberFormat.currency(symbol: '₹', decimalDigits: 0);
     final minBid = widget.auction.minRequiredBid;
     final increment = widget.auction.minIncrement;
 
@@ -189,8 +189,8 @@ class _QuickBidSheetState extends State<QuickBidSheet> {
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.primary),
             decoration: InputDecoration(
-              labelText: 'Bid Amount (USD)',
-              prefixIcon: const Icon(Icons.attach_money, color: AppTheme.primary),
+              labelText: 'Bid Amount (₹)',
+              prefixIcon: const Icon(Icons.currency_rupee, color: AppTheme.primary),
               helperText: 'Minimum required: ${currency.format(minBid)}',
             ),
             onChanged: (val) {

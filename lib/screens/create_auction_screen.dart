@@ -289,8 +289,8 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
                       controller: _startingPriceController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       decoration: const InputDecoration(
-                        labelText: 'Starting Price (\$)',
-                        prefixText: '\$ ',
+                        labelText: 'Starting Price (₹)',
+                        prefixText: '₹ ',
                       ),
                       validator: (val) {
                         final n = num.tryParse(val ?? '');
@@ -305,12 +305,12 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
                       controller: _minIncrementController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       decoration: const InputDecoration(
-                        labelText: 'Min Increment (\$)',
-                        prefixText: '\$ ',
+                        labelText: 'Min Increment (₹)',
+                        prefixText: '₹ ',
                       ),
                       validator: (val) {
                         final n = num.tryParse(val ?? '');
-                        if (n == null || n < 1) return 'Must be >= \$1';
+                        if (n == null || n < 1) return 'Must be >= ₹1';
                         return null;
                       },
                     ),

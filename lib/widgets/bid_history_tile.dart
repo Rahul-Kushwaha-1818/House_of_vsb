@@ -32,7 +32,7 @@ class BidHistoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formattedAmount = NumberFormat.currency(symbol: '\$', decimalDigits: 0).format(bid.amount);
+    final formattedAmount = NumberFormat.currency(symbol: '₹', decimalDigits: 0).format(bid.amount);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),

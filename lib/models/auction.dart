@@ -62,17 +62,17 @@ class Auction {
   }
 
   String get formattedCurrentBid {
-    final formatter = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
+    final formatter = NumberFormat.currency(symbol: '₹', decimalDigits: 0);
     return formatter.format(hasBids ? currentHighestBid : startingPrice);
   }
 
   String get formattedStartingPrice {
-    final formatter = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
+    final formatter = NumberFormat.currency(symbol: '₹', decimalDigits: 0);
     return formatter.format(startingPrice);
   }
 
   String get formattedMinIncrement {
-    final formatter = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
+    final formatter = NumberFormat.currency(symbol: '₹', decimalDigits: 0);
     return formatter.format(minIncrement);
   }
 

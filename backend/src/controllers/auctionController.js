@@ -258,8 +258,8 @@ const placeBid = async (req, res, next) => {
       return res.status(400).json({
         success: false,
         message: hasExistingBids
-          ? `Bid too low. Minimum required bid is $${minRequiredBid} (Current highest: $${auction.currentHighestBid} + $${auction.minIncrement} increment)`
-          : `Bid too low. The first bid must be at least the starting price of $${auction.startingPrice}`,
+          ? `Bid too low. Minimum required bid is ₹${minRequiredBid} (Current highest: ₹${auction.currentHighestBid} + ₹${auction.minIncrement} increment)`
+          : `Bid too low. The first bid must be at least the starting price of ₹${auction.startingPrice}`,
         minRequiredBid,
         currentHighestBid: auction.currentHighestBid,
       });
@@ -322,7 +322,7 @@ const placeBid = async (req, res, next) => {
 
       return res.status(409).json({
         success: false,
-        message: `Conflict! Another bidder placed a bid of $${fresh.currentHighestBid} just ahead of you. Minimum required bid is now $${freshMin}.`,
+        message: `Conflict! Another bidder placed a bid of ₹${fresh.currentHighestBid} just ahead of you. Minimum required bid is now ₹${freshMin}.`,
         currentHighestBid: fresh.currentHighestBid,
         minRequiredBid: freshMin,
       });
