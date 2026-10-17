@@ -181,7 +181,7 @@ const createAuction = async (req, res, next) => {
     const populated = await Auction.findById(auction._id)
       .populate('createdBy', 'name email');
 
-    broadcastAuctionCreated(populated);
+    broadcastAuctionCreated(populated); // here we update the without refreashing the page
 
     return res.status(201).json({
       success: true,

@@ -7,7 +7,6 @@ const { initSocket } = require('./src/services/socketService');
 const { startAuctionWorker, stopAuctionWorker } = require('./src/services/auctionWorker');
 // keep alive service so render free tier doesn't sleep
 const { startKeepAlive, stopKeepAlive } = require('./src/services/keepAliveService');
-const { seedUsersAndAuctions } = require('./src/config/seedHelper');
 
 const PORT = process.env.PORT || 5000;
 
@@ -29,7 +28,6 @@ initSocket(io);
 const startServer = async () => {
   try {
     await connectDB();
-    await seedUsersAndAuctions();
 
     server.listen(PORT, '0.0.0.0', () => {
       console.log(`===============================================`);
